@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bimini Basin Bar Study</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: linear-gradient(180deg, #020617, #0f172a);
+  color: #e2e8f0;
+  text-align: center;
+}
+
+h1 {
+  color: #38bdf8;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  font-size: 16px;
+}
+
+button:hover {
+  background: #334155;
+}
+
+.correct { background:#16a34a !important; }
+.wrong { background:#dc2626 !important; }
+
+.hidden { display:none; }
+
+.progress {
+  height: 8px;
+  background: #1e293b;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #38bdf8;
+  border-radius: 5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Bimini Basin Study</h1>
+
+<div id="menu"></div>
+
+<div id="quiz" class="hidden">
+  <div class="progress"><div id="bar" class="progress-bar"></div></div>
+  <div id="counter"></div>
+  <h3 id="question"></h3>
+  <div id="answers"></div>
+  <p id="explanation"></p>
+  <button onclick="nextQuestion()">Next</button>
+</div>
+
+<div id="results" class="hidden">
+  <h2 id="score"></h2>
+  <button onclick="location.reload()">Restart</button>
+</div>
+
+</div>
+
+<script>
+
+// ================= DATABASE =================
+const drinks = [
+
+{
+name:"House Margarita",
+category:"Margarita",
+ingredients:[
+{name:"Corazon Blanco Tequila",amount:1.5,unit:"oz"},
+{name:"Filthy Margarita Mix",amount:1.5,unit:"oz"},
+{name:"Orange Juice",amount:0.5,unit:"oz"},
+{name:"Kosher Salt",amount:1,unit:"tsp"},
+{name:"Finest Call Lime Juice",amount:0.5,unit:"oz"},
+{name:"Dehydrated Lime",amount:1,unit:"count"}
+]
+},
+
+{
+name:"Pineapple Jalapeno Margarita",
+category:"Margarita",
+ingredients:[
+{name:"Tanteo Jalapeno Tequila",amount:1.5,unit:"oz"},
+{name:"Dole Pineapple Juice",amount:2,unit:"oz"},
+{name:"Cointreau",amount:0.5,unit:"oz"},
+{name:"Filthy Margarita Mix",amount:1,unit:"oz"},
+{name:"Tajin",amount:2,unit:"tsp"}
+]
+},
+
+{
+name:"Passionfruit Margarita",
+category:"Margarita",
+ingredients:[
+{name:"Patron Reposado",amount:1.5,unit:"oz"},
+{name:"Passionfruit Re’al",amount:1,unit:"oz"},
+{name:"Filthy Margarita Mix",amount:1.5,unit:"oz"},
+{name:"Grand Marnier",amount:0.5,unit:"oz"},
+{name:"Dehydrated Lime",amount:2,unit:"count"}
+]
+},
+
+{
+name:"Bimini Basin Margarita",
+category:"Margarita",
+ingredients:[
+{name:"Partida Blanco",amount:1.5,unit:"oz"},
+{name:"Filthy Margarita Mix",amount:1,unit:"oz"},
+{name:"Prickly Pear Re’al",amount:1,unit:"oz"},
+{name:"Lime Juice",amount:0.5,unit:"oz"},
+{name:"Dehydrated Lime",amount:2,unit:"count"}
+]
+},
+
+{
+name:"Slim Rita",
+category:"Margarita",
+ingredients:[
+{name:"Casamigos Blanco",amount:1.5,unit:"oz"},
+{name:"Lime Juice",amount:1.5,unit:"oz"},
+{name:"Orange Juice",amount:1,unit:"oz"},
+{name:"Agave Nectar",amount:1,unit:"oz"}
+]
+},
+
+{
+name:"Gin & Fin",
+category:"Cocktail",
+ingredients:[
+{name:"Gray Whale Gin",amount:1.5,unit:"oz"},
+{name:"Passionfruit Re’al",amount:0.5,unit:"oz"},
+{name:"Lime Juice",amount:0.5,unit:"oz"},
+{name:"Grenadine",amount:0.25,unit:"oz"},
+{name:"Soda Water",amount:1,unit:"oz"}
+]
+},
+
+{
+name:"Coconut Mojito",
+category:"Cocktail",
+ingredients:[
+{name:"Siesta Key Coconut Rum",amount:1.5,unit:"oz"},
+{name:"Coconut Re’al",amount:1,unit:"oz"},
+{name:"Soda Water",amount:0.5,unit:"oz"},
+{name:"Sprite",amount:0.5,unit:"oz"},
+{name:"Mint Leaves",amount:6,unit:"count"},
+{name:"Lime Wedges",amount:2,unit:"count"}
+]
+},
+
+{
+name:"Mai Tai",
+category:"Cocktail",
+ingredients:[
+{name:"Flor de Cana 4 Year",amount:1.5,unit:"oz"},
+{name:"Bols Orange Curacao",amount:1,unit:"oz"},
+{name:"Giffard Orgeat",amount:0.25,unit:"oz"},
+{name:"Lime Juice",amount:0.25,unit:"oz"},
+{name:"Pineapple Juice",amount:1,unit:"oz"},
+{name:"Orange Juice",amount:1,unit:"oz"},
+{name:"Myers Dark Rum",amount:0.5,unit:"oz"}
+]
+},
+
+{
+name:"Baja Coconut",
+category:"Cocktail",
+ingredients:[
+{name:"Don Q Coconut Rum",amount:1.5,unit:"oz"},
+{name:"Blue Curacao",amount:0.5,unit:"oz"},
+{name:"Banana Re’al",amount:1,unit:"oz"},
+{name:"Pina Colada Mix",amount:1,unit:"oz"},
+{name:"Toasted Coconut",amount:0.5,unit:"oz"}
+]
+},
+
+{
+name:"Bimini Spritz",
+category:"Spritz",
+ingredients:[
+{name:"St-Germain",amount:1.5,unit:"oz"},
+{name:"Strawberry Re’al",amount:0.5,unit:"oz"},
+{name:"Prosecco",amount:2.5,unit:"oz"},
+{name:"Soda Water",amount:1,unit:"oz"}
+]
+},
+
+{
+name:"Bourbon Sunset",
+category:"Cocktail",
+ingredients:[
+{name:"Horse Soldier Bourbon",amount:1.5,unit:"oz"},
+{name:"Passionfruit Re’al",amount:0.5,unit:"oz"},
+{name:"Lime Juice",amount:0.5,unit:"oz"},
+{name:"Simple Syrup",amount:0.5,unit:"oz"},
+{name:"Bitters",amount:2,unit:"dashes"}
+]
+},
+
+{
+name:"Call Me Old Fashioned",
+category:"Cocktail",
+ingredients:[
+{name:"Makers Mark",amount:2,unit:"oz"},
+{name:"Cherry Syrup",amount:1,unit:"oz"},
+{name:"Bitters",amount:2,unit:"dashes"},
+{name:"Orange Bitters",amount:2,unit:"dashes"}
+]
+},
+
+{
+name:"Strawberry Daiquiri",
+category:"Frozen",
+ingredients:[
+{name:"Don Q Rum",amount:1.5,unit:"oz"},
+{name:"Strawberry Mix",amount:4,unit:"oz"},
+{name:"Strawberry Re’al",amount:1,unit:"oz"}
+]
+},
+
+{
+name:"Mango Daiquiri",
+category:"Frozen",
+ingredients:[
+{name:"Don Q Rum",amount:1.5,unit:"oz"},
+{name:"Mango Mix",amount:4,unit:"oz"}
+]
+},
+
+{
+name:"Mint Lemonade",
+category:"Frozen",
+ingredients:[
+{name:"Titos Vodka",amount:1.5,unit:"oz"},
+{name:"Lemonade Mix",amount:3,unit:"oz"},
+{name:"Strawberry Re’al",amount:0.5,unit:"oz"},
+{name:"Mint Leaves",amount:6,unit:"count"}
+]
+},
+
+{
+name:"Frose",
+category:"Frozen",
+ingredients:[
+{name:"Deep Eddy Vodka",amount:1.5,unit:"oz"},
+{name:"Peach Mix",amount:2,unit:"oz"},
+{name:"Rose Wine",amount:3,unit:"oz"},
+{name:"Peach Re’al",amount:1,unit:"oz"}
+]
+},
+
+{
+name:"Key Lime Pie Martini",
+category:"Martini",
+ingredients:[
+{name:"Key Lime Rum",amount:1.5,unit:"oz"},
+{name:"Licor 43",amount:0.5,unit:"oz"},
+{name:"Lime Juice",amount:0.5,unit:"oz"},
+{name:"Ice Cream Mix",amount:2,unit:"oz"}
+]
+},
+
+{
+name:"Pineapple Upside Down Martini",
+category:"Martini",
+ingredients:[
+{name:"Vanilla Vodka",amount:1.5,unit:"oz"},
+{name:"Pineapple Juice",amount:1,unit:"oz"},
+{name:"Pineapple Re’al",amount:1,unit:"oz"},
+{name:"Grenadine",amount:0.25,unit:"oz"}
+]
+},
+
+{
+name:"Espresso Martini",
+category:"Martini",
+ingredients:[
+{name:"Frangelico",amount:1,unit:"oz"},
+{name:"Espresso Vodka",amount:0.25,unit:"oz"},
+{name:"Kahlua",amount:0.5,unit:"oz"},
+{name:"Licor 43",amount:0.5,unit:"oz"},
+{name:"Cocoa Bitters",amount:3,unit:"dashes"}
+]
+},
+
+{
+name:"Coral Kiss",
+category:"Martini",
+ingredients:[
+{name:"Hendricks Gin",amount:2,unit:"oz"},
+{name:"St-Germain",amount:0.5,unit:"oz"},
+{name:"Hibiscus Syrup",amount:0.5,unit:"oz"},
+{name:"Pomegranate Juice",amount:1,unit:"oz"},
+{name:"Lemon Juice",amount:0.25,unit:"oz"},
+{name:"Soda Water",amount:1,unit:"oz"}
+]
+},
+
+{
+name:"Cape Cosmo",
+category:"Martini",
+ingredients:[
+{name:"Ketel One",amount:2,unit:"oz"},
+{name:"Lemon Juice",amount:0.5,unit:"oz"},
+{name:"Peach Re’al",amount:0.5,unit:"oz"},
+{name:"White Cranberry",amount:0.75,unit:"oz"}
+]
+},
+
+{
+name:"Cucumber Martini",
+category:"Martini",
+ingredients:[
+{name:"Cucumber Vodka",amount:1.5,unit:"oz"},
+{name:"Lemon Juice",amount:1,unit:"oz"},
+{name:"Simple Syrup",amount:1,unit:"oz"},
+{name:"Cucumber",amount:2,unit:"oz"}
+]
+},
+
+{
+name:"Pineapple Press",
+category:"NA",
+ingredients:[
+{name:"Pineapple Juice",amount:2,unit:"oz"},
+{name:"Lime Juice",amount:0.75,unit:"oz"},
+{name:"Agave",amount:0.5,unit:"oz"},
+{name:"Ginger Beer",amount:2.5,unit:"oz"}
+]
+},
+
+{
+name:"Sunlit Paloma",
+category:"NA",
+ingredients:[
+{name:"Grapefruit Soda",amount:3.5,unit:"oz"},
+{name:"Lime Juice",amount:0.75,unit:"oz"},
+{name:"Agave",amount:0.25,unit:"oz"}
+]
+}
+
+];
+
+// ================= STATE =================
+let set = [];
+let q;
+let index=0;
+let score=0;
+let difficulty="easy";
+
+// ================= INIT =================
+function init(){
+
+  const cats = [...new Set(drinks.map(d=>d.category))];
+  const menu = document.getElementById("menu");
+
+  // Difficulty
+  ["easy","hard","expert"].forEach(d=>{
+    let btn=document.createElement("button");
+    btn.innerText="Mode: "+d;
+    btn.onclick=()=>difficulty=d;
+    menu.appendChild(btn);
+  });
+
+  // Categories
+  let allBtn=document.createElement("button");
+  allBtn.innerText="All Drinks";
+  allBtn.onclick=()=>start("all");
+  menu.appendChild(allBtn);
+
+  cats.forEach(cat=>{
+    let btn=document.createElement("button");
+    btn.innerText=cat;
+    btn.onclick=()=>start(cat);
+    menu.appendChild(btn);
+  });
+}
+
+// ================= START =================
+function start(cat){
+  set = cat==="all"?drinks:drinks.filter(d=>d.category===cat);
+
+  index=0;
+  score=0;
+
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+
+  nextQuestion();
+}
+
+// ================= QUESTION =================
+function generate(){
+
+  const drink = set[Math.floor(Math.random()*set.length)];
+  const ing = drink.ingredients[Math.floor(Math.random()*drink.ingredients.length)];
+
+  // EASY
+  if(difficulty==="easy"){
+    return {
+      text:`Which ingredient is in ${drink.name}?`,
+      correct: ing.name,
+      options: generateIngredientOptions(ing.name)
+    };
+  }
+
+  // HARD
+  if(difficulty==="hard"){
+    return {
+      text:`How many ${ing.unit} of ${ing.name} in ${drink.name}?`,
+      correct: ing.amount,
+      options: generateAmountOptions(ing.amount)
+    };
+  }
+
+  // EXPERT
+  const correct = drink.ingredients.map(i=>i.name).join(", ");
+
+  return {
+    text:`Full recipe for ${drink.name}?`,
+    correct,
+    options: generateRecipeOptions(correct)
+  };
+}
+
+// ================= OPTION GENERATORS =================
+function generateIngredientOptions(correct){
+  let options=[correct];
+
+  while(options.length<4){
+    let rand = drinks[Math.floor(Math.random()*drinks.length)];
+    let ing = rand.ingredients[Math.floor(Math.random()*rand.ingredients.length)].name;
+    if(!options.includes(ing)) options.push(ing);
+  }
+
+  return shuffle(options);
+}
+
+function generateAmountOptions(correct){
+  let base=[0.25,0.5,0.75,1,1.5,2,2.5,3];
+  let options=[correct];
+
+  while(options.length<4){
+    let fake = base[Math.floor(Math.random()*base.length)];
+    if(!options.includes(fake)) options.push(fake);
+  }
+
+  return shuffle(options);
+}
+
+function generateRecipeOptions(correct){
+  let options=[correct];
+
+  while(options.length<4){
+    let rand = drinks[Math.floor(Math.random()*drinks.length)];
+    let fake = rand.ingredients.map(i=>i.name).join(", ");
+    if(!options.includes(fake)) options.push(fake);
+  }
+
+  return shuffle(options);
+}
+
+// ================= NEXT =================
+function nextQuestion(){
+
+  if(index>=10){
+    end();
+    return;
+  }
+
+  q = generate();
+  index++;
+
+  document.getElementById("counter").innerText = `${index}/10`;
+
+  document.getElementById("bar").style.width =
+    (index/10*100)+"%";
+
+  document.getElementById("question").innerText = q.text;
+
+  const answers = document.getElementById("answers");
+  answers.innerHTML="";
+
+  document.getElementById("explanation").innerText="";
+
+  q.options.forEach(opt=>{
+    let btn=document.createElement("button");
+    btn.innerText=opt;
+    btn.onclick=()=>select(btn,opt);
+    answers.appendChild(btn);
+  });
+}
+
+// ================= SELECT =================
+function select(btn,val){
+
+  const buttons=document.querySelectorAll("#answers button");
+
+  buttons.forEach(b=>{
+    b.disabled=true;
+    if(b.innerText==q.correct) b.classList.add("correct");
+  });
+
+  if(val==q.correct){
+    score++;
+  } else {
+    btn.classList.add("wrong");
+  }
+
+  document.getElementById("explanation").innerText =
+    `Correct: ${q.correct}`;
+}
+
+// ================= END =================
+function end(){
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("results").classList.remove("hidden");
+
+  document.getElementById("score").innerText =
+    `Score: ${score}/10`;
+}
+
+// ================= UTIL =================
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-0.5);
+}
+
+init();
+
+</script>
+
+</body>
+</html>
