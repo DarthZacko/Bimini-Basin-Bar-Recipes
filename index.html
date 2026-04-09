@@ -516,6 +516,10 @@ function setMode(m){
   document.getElementById("counter").innerText = "Mode: " + m;
 }
 
+// ================= SOUNDS =================
+const correctSound = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+const wrongSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+
 // ================= INIT =================
 function init(){
 
@@ -690,18 +694,22 @@ function nextQuestion(){
 // ================= SELECT =================
 function select(btn,val){
 
-  const buttons=document.querySelectorAll("#answers button");
+  const buttons = document.querySelectorAll("#answers button");
 
   buttons.forEach(b=>{
-    b.disabled=true;
-    if(b.innerText==q.correct) b.classList.add("correct");
+    b.disabled = true;
+    if(b.innerText == q.correct) b.classList.add("correct");
   });
 
-  if(val==q.correct){
-    score++;
-  } else {
-    btn.classList.add("wrong");
-  }
+if(val == q.correct){
+  score++;
+  correctSound.currentTime = 0;
+  correctSound.play();
+} else {
+  btn.classList.add("wrong");
+  wrongSound.currentTime = 0;
+  wrongSound.play();
+}
 
   document.getElementById("explanation").innerText =
     `Correct: ${q.correct}`;
