@@ -528,6 +528,25 @@ function start(cat){
   nextQuestion();
 }
 
+// ================= START TIMER ==============
+function startTimer(){
+
+  clearInterval(timer);
+  timeLeft = 30;
+
+  timer = setInterval(()=>{
+    timeLeft--;
+
+    document.getElementById("counter").innerText =
+      `${index}/10 | ⏱ ${timeLeft}s`;
+
+    if(timeLeft <= 0){
+      clearInterval(timer);
+      nextQuestion();
+    }
+
+  },1000);
+}
 // ================= QUESTION =================
 function generate(){
 
@@ -601,7 +620,12 @@ function generateRecipeOptions(correct){
 
 // ================= NEXT =================
 function nextQuestion(){
-
+  if(mode === "rush"){
+  startTimer();
+} else {
+  clearInterval(timer);
+}
+  
   if(index>=10){
     end();
     return;
