@@ -20,7 +20,15 @@
   --correct: #16a34a;
   --wrong: #dc2626;
 }
+.active-mode {
+  border: 2px solid var(--teal);
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.6);
+}
 
+button {
+  transition: all 0.15s ease;
+}
+  
 * {
   box-sizing: border-box;
 }
@@ -172,9 +180,9 @@ button:disabled {
 
   <div class="section-title">Game Mode</div>
 
-  <button onclick="setMode('normal')">Normal</button>
-  <button onclick="setMode('rush')">Rush (30s)</button>
-  <button onclick="setMode('review')">Review Missed</button>
+<button id="mode-normal" onclick="setMode('normal')">Normal</button>
+<button id="mode-rush" onclick="setMode('rush')">Rush (30s)</button>
+<button id="mode-review" onclick="setMode('review')">Review Missed</button>
 
   <div id="menu" class="card"></div>
 
@@ -491,7 +499,17 @@ let missedQuestions = [];
 // ================= MODE FUNCTION =================
 function setMode(m){
   mode = m;
-  alert("Game mode set to: " + m);
+
+  // Remove active from all
+  document.getElementById("mode-normal").classList.remove("active-mode");
+  document.getElementById("mode-rush").classList.remove("active-mode");
+  document.getElementById("mode-review").classList.remove("active-mode");
+
+  // Add active to selected
+  document.getElementById("mode-" + m).classList.add("active-mode");
+
+  // Update UI label
+  document.getElementById("counter").innerText = "Mode: " + m;
 }
 
 // ================= INIT =================
