@@ -477,6 +477,12 @@ ingredients:[
 ];
 
 // ================= STATE =================
+let set = [];
+let q = null;
+let index = 0;
+let score = 0;
+let difficulty = "easy";
+
 let mode = "normal";
 let timer = null;
 let timeLeft = 30;
@@ -485,6 +491,7 @@ let missedQuestions = [];
 // ================= MODE FUNCTION =================
 function setMode(m){
   mode = m;
+  alert("Game mode set to: " + m);
 }
 
 // ================= INIT =================
@@ -620,13 +627,10 @@ function generateRecipeOptions(correct){
 
 // ================= NEXT =================
 function nextQuestion(){
-  if(mode === "rush"){
-  startTimer();
-} else {
+
   clearInterval(timer);
-}
-  
-  if(index>=10){
+
+  if(index >= 10){
     end();
     return;
   }
@@ -634,24 +638,28 @@ function nextQuestion(){
   q = generate();
   index++;
 
-  document.getElementById("counter").innerText = `${index}/10`;
-
   document.getElementById("bar").style.width =
-    (index/10*100)+"%";
+    (index / 10 * 100) + "%";
 
   document.getElementById("question").innerText = q.text;
 
   const answers = document.getElementById("answers");
-  answers.innerHTML="";
+  answers.innerHTML = "";
 
-  document.getElementById("explanation").innerText="";
+  document.getElementById("explanation").innerText = "";
 
   q.options.forEach(opt=>{
-    let btn=document.createElement("button");
-    btn.innerText=opt;
-    btn.onclick=()=>select(btn,opt);
+    let btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = ()=>select(btn,opt);
     answers.appendChild(btn);
   });
+
+  if(mode === "rush"){
+    startTimer();
+  } else {
+    document.getElementById("counter").innerText = `${index}/10`;
+  }
 }
 
 // ================= SELECT =================
