@@ -167,7 +167,14 @@ button:disabled {
 
 <div class="container">
   <h1>Bimini Basin Study</h1>
+
   <p class="brand-subtitle">Dock • Dine • Unwind</p>
+
+  <div class="section-title">Game Mode</div>
+
+  <button onclick="setMode('normal')">Normal</button>
+  <button onclick="setMode('rush')">Rush (30s)</button>
+  <button onclick="setMode('review')">Review Missed</button>
 
   <div id="menu" class="card"></div>
 
@@ -470,11 +477,15 @@ ingredients:[
 ];
 
 // ================= STATE =================
-let set = [];
-let q;
-let index=0;
-let score=0;
-let difficulty="easy";
+let mode = "normal";
+let timer = null;
+let timeLeft = 30;
+let missedQuestions = [];
+
+// ================= MODE FUNCTION =================
+function setMode(m){
+  mode = m;
+}
 
 // ================= INIT =================
 function init(){
