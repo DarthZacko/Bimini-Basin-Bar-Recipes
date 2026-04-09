@@ -529,7 +529,7 @@ function init(){
   // Difficulty
   ["easy","hard","expert"].forEach(d=>{
     let btn=document.createElement("button");
-    btn.innerText="Mode: "+d;
+   btn.innerText="Difficulty: " + d;
     btn.onclick=()=>difficulty=d;
     menu.appendChild(btn);
   });
