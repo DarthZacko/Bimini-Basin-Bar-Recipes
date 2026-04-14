@@ -198,19 +198,20 @@ button:disabled {
 
 <div id="menu" class="card hidden"></div>
 
-  <div id="quiz" class="hidden card">
-    <div class="progress"><div id="bar" class="progress-bar"></div></div>
-    <div id="counter"></div>
-    <h3 id="question"></h3>
-    <div id="answers"></div>
-    <p id="explanation"></p>
-    <button onclick="nextQuestion()">Next</button>
-  </div>
+<div id="quiz" class="hidden card">
+  <div class="progress"><div id="bar" class="progress-bar"></div></div>
+  <div id="counter"></div>
+  <h3 id="question"></h3>
+  <div id="answers"></div>
+  <p id="explanation"></p>
+<button id="nextBtn" onclick="nextByModule()">Next</button>
+  <button onclick="backToMenu()">⬅ Back</button>
+</div>
 
-  <div id="results" class="hidden card">
-    <h2 id="score"></h2>
-    <button onclick="location.reload()">Restart</button>
-  </div>
+<div id="results" class="hidden card">
+  <h2 id="score"></h2>
+  <button onclick="restartCurrentModule()">Restart</button>
+  <button onclick="backToMenu()">⬅ Back</button>
 </div>
 
 <script>
@@ -669,7 +670,15 @@ function buildMenu(){
       menu.appendChild(btn);
     });
   }
+  // ===== NEXT MODULE =====
 
+  function nextByModule(){
+  if(currentModule === "food"){
+    nextFoodQuestion();
+  } else {
+    nextQuestion();
+  }
+}
   // ===== FOOD =====
   if(currentModule === "food"){
     const cats = [...new Set(foodItems.map(d=>d.category))];
@@ -731,14 +740,31 @@ function goHome(){
   document.getElementById("home").classList.remove("hidden");
 }
 
+function backToMenu(){
+  clearInterval(timer);
+
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("results").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById("home").classList.add("hidden");
+
+  buildMenu();
+}
+
+function restartCurrentModule(){
+  document.getElementById("results").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  buildMenu();
+}
 // ================= FOOD START =================
 function startFood(cat){
-  set = cat==="all"?foodItems:foodItems.filter(d=>d.category===cat);
+  set = cat === "all" ? foodItems : foodItems.filter(d => d.category === cat);
 
-  index=0;
-  score=0;
+  index = 0;
+  score = 0;
 
   document.getElementById("menu").classList.add("hidden");
+  document.getElementById("results").classList.add("hidden");
   document.getElementById("quiz").classList.remove("hidden");
 
   nextFoodQuestion();
@@ -746,10 +772,151 @@ function startFood(cat){
 
 // ================= FOOD QUESTION (TEMP) =================
 function nextFoodQuestion(){
-  nextQuestion(); // temporary reuse
+
+  clearInterval(timer);
+
+  if(index >= 10){
+    end();
+    return;
+  }
+
+  q = generateFoodQuestion();
+  index++;
+
+  document.getElementById("bar").style.width =
+    (index / 10 * 100) + "%";
+
+  document.getElementById("question").innerText = q.text;
+
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
+
+  document.getElementById("explanation").innerText = "";
+
+  q.options.forEach(opt=>{
+    let btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = ()=>select(btn,opt);
+    answers.appendChild(btn);
+  });
+
+  if(mode === "rush"){
+    startTimer();
+  } else {
+    document.getElementById("counter").innerText = `${index}/10`;
+  }
 }
 
+  // ================= FOOD OPTION HELPERS =================
+function uniqueShuffled(arr){
+  return [...new Set(arr)].filter(Boolean).sort(()=>Math.random()-0.5);
+}
 
+function pickRandom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function buildWrongOptions(correct, pool){
+  const options = [correct];
+  const cleanPool = uniqueShuffled(pool).filter(item => item !== correct);
+
+  while(options.length < 4 && cleanPool.length > 0){
+    const candidate = cleanPool.pop();
+    if(!options.includes(candidate)){
+      options.push(candidate);
+    }
+  }
+
+  return shuffle(options);
+}
+
+function allFoodCategories(){
+  return [...new Set(foodItems.map(item => item.category))];
+}
+
+function allFoodCondiments(){
+  return uniqueShuffled(foodItems.flatMap(item => item.condiments || []));
+}
+
+function allFoodSides(){
+  return uniqueShuffled(foodItems.flatMap(item => item.sides || []));
+}
+
+function allFoodPortions(){
+  return uniqueShuffled(foodItems.map(item => item.portion || "").filter(Boolean));
+}
+
+function allFoodDescriptions(){
+  return uniqueShuffled(foodItems.map(item => item.description || "").filter(Boolean));
+}
+
+// ================= FOOD QUESTION GENERATOR =================
+function generateFoodQuestion(){
+  const item = pickRandom(set);
+
+  const availableTypes = ["category"];
+
+  if(item.condiments && item.condiments.length > 0) availableTypes.push("condiment");
+  if(item.sides && item.sides.length > 0) availableTypes.push("side");
+  if(item.portion) availableTypes.push("portion");
+  if(item.description) availableTypes.push("description");
+
+  let type = "category";
+
+  if(difficulty === "easy"){
+    const easyTypes = availableTypes.filter(t => ["category", "condiment", "side"].includes(t));
+    type = pickRandom(easyTypes.length ? easyTypes : availableTypes);
+  } else if(difficulty === "hard"){
+    const hardTypes = availableTypes.filter(t => ["condiment", "side", "portion", "category"].includes(t));
+    type = pickRandom(hardTypes.length ? hardTypes : availableTypes);
+  } else {
+    const expertTypes = availableTypes.filter(t => ["description", "portion", "condiment", "side", "category"].includes(t));
+    type = pickRandom(expertTypes.length ? expertTypes : availableTypes);
+  }
+
+  if(type === "category"){
+    const correct = item.category;
+    return {
+      text: `Which category does ${item.name} belong to?`,
+      correct,
+      options: buildWrongOptions(correct, allFoodCategories())
+    };
+  }
+
+  if(type === "condiment"){
+    const correct = pickRandom(item.condiments);
+    return {
+      text: `Which condiment comes with ${item.name}?`,
+      correct,
+      options: buildWrongOptions(correct, allFoodCondiments())
+    };
+  }
+
+  if(type === "side"){
+    const correct = pickRandom(item.sides);
+    return {
+      text: `Which side comes with ${item.name}?`,
+      correct,
+      options: buildWrongOptions(correct, allFoodSides())
+    };
+  }
+
+  if(type === "portion"){
+    const correct = item.portion;
+    return {
+      text: `What is the portion for ${item.name}?`,
+      correct,
+      options: buildWrongOptions(correct, allFoodPortions())
+    };
+  }
+
+  const correct = item.description;
+  return {
+    text: `Which description matches ${item.name}?`,
+    correct,
+    options: buildWrongOptions(correct, allFoodDescriptions())
+  };
+}
 // ================= NEXT =================
 function nextQuestion(){
 
