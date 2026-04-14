@@ -496,6 +496,105 @@ ingredients:[
 
 ];
 
+// ================= FOOD DATABASE =================
+const foodItems = [
+  {
+    name: "Hot Crab & Cheese Dip",
+    category: "Starters",
+    description: "White American cheese dip with blue crab, jalapenos, onion, cilantro, tomato.",
+    portion: "8 oz",
+    condiments: [],
+    sides: ["Tortilla chips"]
+  },
+  {
+    name: "Crispy Wings",
+    category: "Starters",
+    description: "Fried wings tossed in hot honey pineapple sauce.",
+    portion: "8 wings",
+    condiments: ["Blue cheese dressing"],
+    sides: []
+  },
+  {
+    name: "Calamari",
+    category: "Starters",
+    description: "Lightly breaded fried calamari.",
+    portion: "8 oz",
+    condiments: ["Orange chili sauce"],
+    sides: []
+  },
+  {
+    name: "House Salad",
+    category: "Salads",
+    description: "Spring mix, cucumber, tomato, onion, bleu cheese.",
+    portion: "Large or small",
+    condiments: ["Apple cider vinaigrette"],
+    sides: []
+  },
+  {
+    name: "Caesar Salad",
+    category: "Salads",
+    description: "Romaine, parmesan, croutons.",
+    portion: "Large or small",
+    condiments: ["Caesar dressing"],
+    sides: []
+  },
+  {
+    name: "Black Grouper Sandwich",
+    category: "Sandwiches",
+    description: "Fried grouper on brioche bun.",
+    portion: "5 oz",
+    condiments: ["Lemon caper tartar"],
+    sides: ["Fries", "Slaw"]
+  },
+  {
+    name: "Cheeseburger",
+    category: "Sandwiches",
+    description: "Sirloin blend burger on brioche bun.",
+    portion: "8 oz",
+    condiments: [],
+    sides: ["Fries", "Slaw"]
+  },
+  {
+    name: "Fish & Chips",
+    category: "Dinners",
+    description: "Fried fish served with fries.",
+    portion: "6-7 oz",
+    condiments: ["Tartar sauce"],
+    sides: ["Fries"]
+  },
+  {
+    name: "Snow Crab",
+    category: "Seafood Bar",
+    description: "Sweet Alaskan crab legs served with butter.",
+    portion: "1/2 lb or 1 lb",
+    condiments: ["Butter"],
+    sides: []
+  },
+  {
+    name: "Shrimp Cocktail",
+    category: "Seafood Bar",
+    description: "Chilled shrimp with cocktail sauce.",
+    portion: "6 shrimp",
+    condiments: ["Cocktail sauce"],
+    sides: []
+  },
+  {
+    name: "Wellfleet Oysters",
+    category: "Oysters",
+    description: "Briny, crisp, slightly sweet.",
+    portion: "Half or full dozen",
+    condiments: ["Cocktail sauce", "Horseradish"],
+    sides: []
+  },
+  {
+    name: "Key Lime Pie",
+    category: "Desserts",
+    description: "Graham crust, lime filling, whipped cream.",
+    portion: "Slice",
+    condiments: [],
+    sides: []
+  }
+];
 // ================= STATE =================
 let set = [];
 let q = null;
@@ -528,8 +627,8 @@ function setMode(m){
 const correctSound = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
 const wrongSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
 
-// ================= INIT =================
- // ================= MODULE SYSTEM =================
+
+// ================= MODULE SYSTEM =================
 let currentModule = "beverage";
 
 function startModule(module){
