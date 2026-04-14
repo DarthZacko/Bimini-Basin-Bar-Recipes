@@ -173,6 +173,27 @@ button:disabled {
   color: var(--muted);
   font-size: .85rem;
 }
+
+#learnBox {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#learnLink {
+  display: inline-block;
+  color: var(--aqua);
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+}
+
+#learnLink:hover {
+  color: #ffffff;
+  border-color: var(--teal);
+}
 </style></head>
 
 <body>
@@ -203,7 +224,10 @@ button:disabled {
   <div id="counter"></div>
   <h3 id="question"></h3>
   <div id="answers"></div>
-  <p id="explanation"></p>
+<p id="explanation"></p>
+<div id="learnBox" class="hidden">
+  <a id="learnLink" href="#" target="_blank" rel="noopener noreferrer">Learn More</a>
+</div>
 <button id="nextBtn" onclick="nextByModule()" disabled>Next</button>
   <button onclick="backToMenu()">⬅ Back</button>
 </div>
@@ -857,6 +881,8 @@ function allFoodDescriptions(){
 function generateFoodQuestion(){
   const item = pickRandom(set);
 
+  const learnLink = item.learnLink || "";
+  
   const availableTypes = ["category"];
 
   if(item.condiments && item.condiments.length > 0) availableTypes.push("condiment");
