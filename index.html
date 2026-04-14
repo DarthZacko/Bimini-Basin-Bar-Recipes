@@ -204,7 +204,7 @@ button:disabled {
   <h3 id="question"></h3>
   <div id="answers"></div>
   <p id="explanation"></p>
-<button id="nextBtn" onclick="nextByModule()">Next</button>
+<button id="nextBtn" onclick="nextByModule()" disabled>Next</button>
   <button onclick="backToMenu()">⬅ Back</button>
 </div>
 
@@ -794,6 +794,7 @@ function nextFoodQuestion(){
   answers.innerHTML = "";
 
   document.getElementById("explanation").innerText = "";
+  document.getElementById("nextBtn").disabled = true;
 
   q.options.forEach(opt=>{
     let btn = document.createElement("button");
@@ -942,6 +943,7 @@ function nextQuestion(){
   answers.innerHTML = "";
 
   document.getElementById("explanation").innerText = "";
+  document.getElementById("nextBtn").disabled = true;
 
   q.options.forEach(opt=>{
     let btn = document.createElement("button");
@@ -979,7 +981,10 @@ if(val == q.correct){
 
   document.getElementById("explanation").innerText =
     `Correct: ${q.correct}`;
+
+  document.getElementById("nextBtn").disabled = false;
 }
+  
 
 // ================= END =================
 function end(){
