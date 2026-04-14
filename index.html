@@ -188,7 +188,15 @@ button:disabled {
     <button id="mode-review" onclick="setMode('review')">Review Missed</button>
   </div>
 
-  <div id="menu" class="card"></div>
+<div id="home" class="card">
+  <div class="section-title">Training Modules</div>
+
+  <button onclick="startModule('beverage')">🍸 Beverage</button>
+  <button onclick="startModule('food')">🍽 Food</button>
+  <button onclick="startModule('rules')">📋 Rules & Training</button>
+</div>
+
+<div id="menu" class="card hidden"></div>
 
   <div id="quiz" class="hidden card">
     <div class="progress"><div id="bar" class="progress-bar"></div></div>
@@ -521,18 +529,69 @@ const correctSound = new Audio("https://actions.google.com/sounds/v1/cartoon/cla
 const wrongSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
 
 // ================= INIT =================
+  let currentModule = "beverage";
+
+function startModule(module){
+  currentModule = module;
+
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+
+  buildMenu();
+}
+  
 function init(){
+  setMode("normal");
+}
 
-  const cats = [...new Set(drinks.map(d=>d.category))];
+function buildMenu(){
+
   const menu = document.getElementById("menu");
+  menu.innerHTML = "";
 
-  // Difficulty
-  ["easy","hard","expert"].forEach(d=>{
-    let btn=document.createElement("button");
-   btn.innerText="Difficulty: " + d;
-    btn.onclick=()=>difficulty=d;
-    menu.appendChild(btn);
-  });
+  // ================= BEVERAGE =================
+  if(currentModule === "beverage"){
+    const cats = [...new Set(drinks.map(d=>d.category))];
+
+    addDifficultyButtons(menu);
+
+    let allBtn=document.createElement("button");
+    allBtn.innerText="All Drinks";
+    allBtn.onclick=()=>start("all");
+    menu.appendChild(allBtn);
+
+    cats.forEach(cat=>{
+      let btn=document.createElement("button");
+      btn.innerText=cat;
+      btn.onclick=()=>start(cat);
+      menu.appendChild(btn);
+    });
+  }
+
+  // ================= FOOD =================
+  if(currentModule === "food"){
+    const cats = [...new Set(foodItems.map(d=>d.category))];
+
+    addDifficultyButtons(menu);
+
+    let allBtn=document.createElement("button");
+    allBtn.innerText="All Food";
+    allBtn.onclick=()=>startFood("all");
+    menu.appendChild(allBtn);
+
+    cats.forEach(cat=>{
+      let btn=document.createElement("button");
+      btn.innerText=cat;
+      btn.onclick=()=>startFood(cat);
+      menu.appendChild(btn);
+    });
+  }
+
+  // ================= RULES =================
+  if(currentModule === "rules"){
+    showRules();
+  }
+}
 
   // Categories
   let allBtn=document.createElement("button");
@@ -653,6 +712,57 @@ function generateRecipeOptions(correct){
 
   return shuffle(options);
 }
+  
+function addDifficultyButtons(menu){
+  ["easy","hard","expert"].forEach(d=>{
+    let btn=document.createElement("button");
+    btn.innerText="Difficulty: " + d;
+    btn.onclick=()=>difficulty=d;
+    menu.appendChild(btn);
+  });
+}
+
+function showRules(){
+
+  const menu = document.getElementById("menu");
+
+  menu.innerHTML = `
+    <div class="section-title">Rules & Training</div>
+
+    <div class="card">
+      <p><strong>Parking:</strong> Park in designated employee area only.</p>
+      <p><strong>Entrance:</strong> Enter through back kitchen door, not front.</p>
+      <p><strong>Food Policy:</strong> Employee discounts apply only off-clock.</p>
+      <p><strong>Pay Schedule:</strong> Weekly / Bi-weekly (update later).</p>
+      <p><strong>Tips:</strong> Distributed among tipped staff (update details).</p>
+    </div>
+
+    <button onclick="goHome()">⬅ Back</button>
+  `;
+}
+
+function goHome(){
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+function startFood(cat){
+  set = cat==="all"?foodItems:foodItems.filter(d=>d.category===cat);
+
+  index=0;
+  score=0;
+
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+
+  nextFoodQuestion();
+}
+
+function nextFoodQuestion(){
+  // TEMP: reuse drink logic for now
+  nextQuestion();
+}
+
 
 // ================= NEXT =================
 function nextQuestion(){
