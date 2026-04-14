@@ -641,6 +641,16 @@ function startModule(module){
   buildMenu();
 }
 
+   // ===== MODULE ROUTER=====
+
+  function nextByModule(){
+  if(currentModule === "food"){
+    nextFoodQuestion();
+  } else {
+    nextQuestion();
+  }
+}
+  
 // ================= INIT =================
 function init(){
   setMode("normal");
@@ -670,15 +680,7 @@ function buildMenu(){
       menu.appendChild(btn);
     });
   }
-  // ===== NEXT MODULE =====
-
-  function nextByModule(){
-  if(currentModule === "food"){
-    nextFoodQuestion();
-  } else {
-    nextQuestion();
-  }
-}
+ 
   // ===== FOOD =====
   if(currentModule === "food"){
     const cats = [...new Set(foodItems.map(d=>d.category))];
@@ -917,6 +919,7 @@ function generateFoodQuestion(){
     options: buildWrongOptions(correct, allFoodDescriptions())
   };
 }
+  
 // ================= NEXT =================
 function nextQuestion(){
 
