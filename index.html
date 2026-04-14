@@ -529,7 +529,8 @@ const correctSound = new Audio("https://actions.google.com/sounds/v1/cartoon/cla
 const wrongSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
 
 // ================= INIT =================
-  let currentModule = "beverage";
+ // ================= MODULE SYSTEM =================
+let currentModule = "beverage";
 
 function startModule(module){
   currentModule = module;
@@ -539,17 +540,19 @@ function startModule(module){
 
   buildMenu();
 }
-  
+
+// ================= INIT =================
 function init(){
   setMode("normal");
 }
 
+// ================= MENU BUILDER =================
 function buildMenu(){
 
   const menu = document.getElementById("menu");
   menu.innerHTML = "";
 
-  // ================= BEVERAGE =================
+  // ===== BEVERAGE =====
   if(currentModule === "beverage"){
     const cats = [...new Set(drinks.map(d=>d.category))];
 
@@ -568,7 +571,7 @@ function buildMenu(){
     });
   }
 
-  // ================= FOOD =================
+  // ===== FOOD =====
   if(currentModule === "food"){
     const cats = [...new Set(foodItems.map(d=>d.category))];
 
@@ -587,132 +590,13 @@ function buildMenu(){
     });
   }
 
-  // ================= RULES =================
+  // ===== RULES =====
   if(currentModule === "rules"){
     showRules();
   }
 }
 
-  // Categories
-  let allBtn=document.createElement("button");
-  allBtn.innerText="All Drinks";
-  allBtn.onclick=()=>start("all");
-  menu.appendChild(allBtn);
-
-  cats.forEach(cat=>{
-    let btn=document.createElement("button");
-    btn.innerText=cat;
-    btn.onclick=()=>start(cat);
-    menu.appendChild(btn);
-  });
-  setMode("normal");
-}
-
-// ================= START =================
-function start(cat){
-  set = cat==="all"?drinks:drinks.filter(d=>d.category===cat);
-
-  index=0;
-  score=0;
-
-  document.getElementById("menu").classList.add("hidden");
-  document.getElementById("quiz").classList.remove("hidden");
-
-  nextQuestion();
-}
-
-// ================= START TIMER ==============
-function startTimer(){
-  clearInterval(timer);
-  timeLeft = 30;
-
-  document.getElementById("counter").innerText =
-    `${index}/10 | ⏱ ${timeLeft}s`;
-
-  timer = setInterval(()=>{
-    timeLeft--;
-
-    document.getElementById("counter").innerText =
-      `${index}/10 | ⏱ ${timeLeft}s`;
-
-    if(timeLeft <= 0){
-      clearInterval(timer);
-      nextQuestion();
-    }
-  }, 1000);
-}
-  
-// ================= QUESTION =================
-function generate(){
-
-  const drink = set[Math.floor(Math.random()*set.length)];
-  const ing = drink.ingredients[Math.floor(Math.random()*drink.ingredients.length)];
-
-  // EASY
-  if(difficulty==="easy"){
-    return {
-      text:`Which ingredient is in ${drink.name}?`,
-      correct: ing.name,
-      options: generateIngredientOptions(ing.name)
-    };
-  }
-
-  // HARD
-  if(difficulty==="hard"){
-    return {
-      text:`How many ${ing.unit} of ${ing.name} in ${drink.name}?`,
-      correct: ing.amount,
-      options: generateAmountOptions(ing.amount)
-    };
-  }
-
-  // EXPERT
-  const correct = drink.ingredients.map(i=>i.name).join(", ");
-
-  return {
-    text:`Full recipe for ${drink.name}?`,
-    correct,
-    options: generateRecipeOptions(correct)
-  };
-}
-
-// ================= OPTION GENERATORS =================
-function generateIngredientOptions(correct){
-  let options=[correct];
-
-  while(options.length<4){
-    let rand = drinks[Math.floor(Math.random()*drinks.length)];
-    let ing = rand.ingredients[Math.floor(Math.random()*rand.ingredients.length)].name;
-    if(!options.includes(ing)) options.push(ing);
-  }
-
-  return shuffle(options);
-}
-
-function generateAmountOptions(correct){
-  let base=[0.25,0.5,0.75,1,1.5,2,2.5,3];
-  let options=[correct];
-
-  while(options.length<4){
-    let fake = base[Math.floor(Math.random()*base.length)];
-    if(!options.includes(fake)) options.push(fake);
-  }
-
-  return shuffle(options);
-}
-
-function generateRecipeOptions(correct){
-  let options=[correct];
-
-  while(options.length<4){
-    let rand = drinks[Math.floor(Math.random()*drinks.length)];
-    let fake = rand.ingredients.map(i=>i.name).join(", ");
-    if(!options.includes(fake)) options.push(fake);
-  }
-
-  return shuffle(options);
-}
-  
+// ================= DIFFICULTY =================
 function addDifficultyButtons(menu){
   ["easy","hard","expert"].forEach(d=>{
     let btn=document.createElement("button");
@@ -722,6 +606,7 @@ function addDifficultyButtons(menu){
   });
 }
 
+// ================= RULES =================
 function showRules(){
 
   const menu = document.getElementById("menu");
@@ -741,11 +626,13 @@ function showRules(){
   `;
 }
 
+// ================= NAVIGATION =================
 function goHome(){
   document.getElementById("menu").classList.add("hidden");
   document.getElementById("home").classList.remove("hidden");
 }
 
+// ================= FOOD START =================
 function startFood(cat){
   set = cat==="all"?foodItems:foodItems.filter(d=>d.category===cat);
 
@@ -758,9 +645,9 @@ function startFood(cat){
   nextFoodQuestion();
 }
 
+// ================= FOOD QUESTION (TEMP) =================
 function nextFoodQuestion(){
-  // TEMP: reuse drink logic for now
-  nextQuestion();
+  nextQuestion(); // temporary reuse
 }
 
 
